@@ -102,3 +102,41 @@ resource "aws_vpc_security_group_ingress_rule" "aws_vpc_ingress_http" {
   ip_protocol = "tcp"
   cidr_ipv4 = var.base_cidr_block
 }
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners = [ "099720109477" ]
+
+  filter {
+    name = "ubuntu"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-lunar-23.04-amd64-server-*"]
+  }
+}
+
+resource "aws_key_pair" "local_key" {
+  key_name = "4640-key"
+  public_key = file("~/.ssh/4640-key.pub")
+}
+
+resource "aws_instance" "publicinstance" {
+  instance_type = "t2.micro"
+  ami = data.aws_ami.ubuntu.id
+  
+  tags = {
+    Name = "assignment1-public-ubuntu"
+  }
+
+  key_name = aws_key_pair.local_key.key_name
+  vpc_security_group_ids = [aws_security_group.publicsg.id]
+  subnet_id = aws_subnet.publicsub
+
+  root_block_device {
+    volume_size = 10
+  }
+
+  user_data = <<-EOF
+    #!/bin/bash
+    apt-get update -y
+    apt-get install nginx -y
+  EOF
+}
