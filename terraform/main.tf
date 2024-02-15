@@ -91,6 +91,7 @@ resource "aws_vpc_security_group_ingress_rule" "aws_vpc_ingress_ssh" {
   from_port = 22
   to_port = 22
   ip_protocol = "tcp"
+  cidr_ipv4 = var.base_cidr_block
 }
 
 resource "aws_vpc_security_group_ingress_rule" "aws_vpc_ingress_http" {
@@ -99,4 +100,5 @@ resource "aws_vpc_security_group_ingress_rule" "aws_vpc_ingress_http" {
   from_port = 80
   to_port = 80
   ip_protocol = "tcp"
+  cidr_ipv4 = var.base_cidr_block
 }
