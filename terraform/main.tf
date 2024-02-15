@@ -114,8 +114,8 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_key_pair" "local_key" {
-  key_name = "4640-key"
-  public_key = file("~/.ssh/4640-key.pub")
+  key_name = "4640_key"
+  public_key = file("~/.ssh/4640_key.pub")
 }
 
 resource "aws_instance" "publicinstance" {
