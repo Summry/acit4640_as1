@@ -108,7 +108,7 @@ data "aws_ami" "ubuntu" {
   owners = [ "099720109477" ]
 
   filter {
-    name = "ubuntu"
+    name = "name"
     values = ["ubuntu/images/hvm-ssd/ubuntu-lunar-23.04-amd64-server-*"]
   }
 }
@@ -128,7 +128,7 @@ resource "aws_instance" "publicinstance" {
 
   key_name = aws_key_pair.local_key.key_name
   vpc_security_group_ids = [aws_security_group.publicsg.id]
-  subnet_id = aws_subnet.publicsub
+  subnet_id = aws_subnet.publicsub.id
 
   root_block_device {
     volume_size = 10
@@ -136,8 +136,8 @@ resource "aws_instance" "publicinstance" {
 
   user_data = <<-EOF
     #!/bin/bash
-    apt-get update -y
-    apt-get install nginx -y
+    sudo apt-get update -y
+    sudo apt-get install nginx -y
   EOF
 }
 
@@ -151,7 +151,7 @@ resource "aws_instance" "privateinstance" {
 
   key_name = aws_key_pair.local_key.key_name
   vpc_security_group_ids = [aws_security_group.privatesg.id]
-  subnet_id = aws_subnet.privatesub
+  subnet_id = aws_subnet.privatesub.id
 
   root_block_device {
     volume_size = 10
