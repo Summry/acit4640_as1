@@ -157,3 +157,7 @@ resource "aws_instance" "privateinstance" {
     volume_size = 10
   }
 }
+
+output "public_instance_ip" {
+  value = aws_instance.publicinstance.public_ip
+}
