@@ -140,3 +140,20 @@ resource "aws_instance" "publicinstance" {
     apt-get install nginx -y
   EOF
 }
+
+resource "aws_instance" "privateinstance" {
+  instance_type = "t2.micro"
+  ami = data.aws_ami.ubuntu.id
+
+  tags = {
+    Name = "assignment1-private-ubuntu"
+  }
+
+  key_name = aws_key_pair.local_key.key_name
+  vpc_security_group_ids = [aws_security_group.privatesg.id]
+  subnet_id = aws_subnet.privatesub
+
+  root_block_device {
+    volume_size = 10
+  }
+}
