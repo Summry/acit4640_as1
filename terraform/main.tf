@@ -12,13 +12,17 @@ provider "aws" {
 }
 
 variable "base_cidr_block" {
-  description = "This is the default cidr block for the vpc. Use base_cidr_block.id to use it."
+  description = "This is the default cidr block for the vpc. Use var.base_cidr_block to use it."
   default     = "10.0.0.0/16"
 }
 
 resource "aws_vpc" "main" {
   cidr_block        = var.base_cidr_block
   instance_tenancy  = "default"
+}
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
 }
 
 resource "aws_subnet" "publicsub" {
@@ -29,7 +33,47 @@ resource "aws_subnet" "publicsub" {
 }
 
 resource "aws_subnet" "privatesub" {
-  vpc_id = aws_vpc.main.id
-  cidr_block = "10.0.2.0/24"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.0/24"
   availability_zone = "us-west-2a"
+}
+
+resource "aws_route_table" "main" {
+  vpc_id = aws_vpc.main.id
+}
+
+resource "aws_route" "default_route" {
+  route_table_id = aws_route_table.main.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id = aws_internet_gateway.main.id
+}
+
+resource "aws_route_table_association" "main" {
+  subnet_id = aws_subnet.publicsub.id
+  route_table_id = aws_route_table.main.id
+}
+
+resource "aws_security_group" "publicsg" {
+  name = "main"
+  description = "main security group for "
+}
+
+resource "aws_vpc_security_group_ingress_rule" "aws_vpc_ingress_ssh" {
+  # This inbound traffic rule allows SSH access from anywhere - attach it to the public subnet security group.
+  security_group_id = aws_security_group.publicsg.id
+
+  cidr_ipv4 = "0.0.0.0/0"
+  from_port = 22
+  to_port = 22
+  ip_protocol = "tcp"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "aws_vpc_ingress_http" {
+  # This inbound traffic rule allows HTTP access from anywhere - attach it to the public subnet security group.
+  security_group_id = aws_security_group.publicsg.id
+
+  cidr_ipv4 = "0.0.0.0/0"
+  from_port = 80
+  to_port = 80
+  ip_protocol = "tcp"
 }
