@@ -6,6 +6,10 @@ Provision aws infrastructure using terraform. Describe your active infrastructur
 
 - Nazira Fakhrurradi
 
+## Assignment Video
+
+- [Placeholder](https://www.youtube.com/watch?v=oh0RQ_TgDnQ)
+
 ## AWS CLI Describe Commands
 
 ### Describe VPCs
