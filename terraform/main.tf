@@ -59,7 +59,7 @@ resource "aws_security_group" "publicsg" {
   vpc_id = aws_vpc.main.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "aws_vpc_ingress_ssh" {
+resource "aws_vpc_security_group_ingress_rule" "aws_vpc_public_ingress_ssh" {
   # This inbound traffic rule allows SSH access from anywhere - attach it to the public subnet security group.
   security_group_id = aws_security_group.publicsg.id
 
@@ -69,7 +69,7 @@ resource "aws_vpc_security_group_ingress_rule" "aws_vpc_ingress_ssh" {
   ip_protocol = "tcp"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "aws_vpc_ingress_http" {
+resource "aws_vpc_security_group_ingress_rule" "aws_vpc_public_ingress_http" {
   # This inbound traffic rule allows HTTP access from anywhere - attach it to the public subnet security group.
   security_group_id = aws_security_group.publicsg.id
 
@@ -85,7 +85,7 @@ resource "aws_security_group" "privatesg" {
   description = "security group for private subnet"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "aws_vpc_ingress_ssh" {
+resource "aws_vpc_security_group_ingress_rule" "aws_vpc_private_ingress_ssh" {
   security_group_id = aws_security_group.privatesg.id
 
   from_port = 22
@@ -94,7 +94,7 @@ resource "aws_vpc_security_group_ingress_rule" "aws_vpc_ingress_ssh" {
   cidr_ipv4 = var.base_cidr_block
 }
 
-resource "aws_vpc_security_group_ingress_rule" "aws_vpc_ingress_http" {
+resource "aws_vpc_security_group_ingress_rule" "aws_vpc_private_ingress_http" {
   security_group_id = aws_security_group.privatesg.id
 
   from_port = 80
