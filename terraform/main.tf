@@ -59,6 +59,13 @@ resource "aws_security_group" "publicsg" {
   vpc_id = aws_vpc.main.id
 }
 
+resource "aws_vpc_security_group_egress_rule" "aws_vpc_public_egress_any" {
+  security_group_id = aws_security_group.publicsg.id
+
+  cidr_ipv4 = "0.0.0.0/0"
+  ip_protocol = "-1"
+}
+
 resource "aws_vpc_security_group_ingress_rule" "aws_vpc_public_ingress_ssh" {
   # This inbound traffic rule allows SSH access from anywhere - attach it to the public subnet security group.
   security_group_id = aws_security_group.publicsg.id
