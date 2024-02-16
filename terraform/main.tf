@@ -19,15 +19,22 @@ variable "base_cidr_block" {
 }
 
 resource "aws_vpc" "main_vpc" {
+  # Default virtual private cloud occupying a cidr block of 10.0.0.0/16
+
   cidr_block       = var.base_cidr_block
   instance_tenancy = "default"
 }
 
 resource "aws_internet_gateway" "internet_gateway" {
+  # Default internet gateway that is attached to the virtual private cloud
+
   vpc_id = aws_vpc.main_vpc.id
 }
 
 resource "aws_subnet" "public_subnet" {
+  # Public subnet occupying a cidr block of 10.0.1.0/24
+  # Attached to the virtual private cloud under its cidr block of 10.0.0.0/16
+
   vpc_id                  = aws_vpc.main_vpc.id
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "us-west-2a"
@@ -35,22 +42,32 @@ resource "aws_subnet" "public_subnet" {
 }
 
 resource "aws_subnet" "private_subnet" {
+  # Private subnet occupying a cidr block of 10.0.2.0/24
+  # Also attached to the virtual private cloud under its cidr block of 10.0.0.0/16
+
   vpc_id            = aws_vpc.main_vpc.id
   cidr_block        = "10.0.2.0/24"
   availability_zone = "us-west-2a"
 }
 
 resource "aws_route_table" "main_route_table" {
+  # Default route table attached to the virtual private cloud
+
   vpc_id = aws_vpc.main_vpc.id
 }
 
 resource "aws_route" "default_route" {
+  # Default route attached to the route table and internet gateway
+  # Route points towards the internet (0.0.0.0/0)
+
   route_table_id         = aws_route_table.main_route_table.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.internet_gateway.id
 }
 
 resource "aws_route_table_association" "rt_associator" {
+  # Associates the identified route table to the public subnet
+
   subnet_id      = aws_subnet.public_subnet.id
   route_table_id = aws_route_table.main_route_table.id
 }
@@ -62,6 +79,9 @@ resource "aws_security_group" "public_sg" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "pub_out_any" {
+  # Outbound traffic rule that can access the internet
+  # Attached to the public subnet security group
+
   security_group_id = aws_security_group.public_sg.id
 
   cidr_ipv4   = "0.0.0.0/0"
@@ -95,6 +115,8 @@ resource "aws_security_group" "private_sg" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "prv_in_ssh" {
+  # Inbound rule for the private subnet security group - allows SSH traffic
+  
   security_group_id = aws_security_group.private_sg.id
 
   from_port   = 22
@@ -104,6 +126,8 @@ resource "aws_vpc_security_group_ingress_rule" "prv_in_ssh" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "prv_in_http" {
+  # Inbound rule for the private subnet security group - allows HTTP traffic
+
   security_group_id = aws_security_group.private_sg.id
 
   from_port   = 80
@@ -128,6 +152,9 @@ resource "aws_key_pair" "local_key" {
 }
 
 resource "aws_instance" "public_instance" {
+  # EC2 instance attached to the public subnet
+  # User data will promptly install nginx upon successfully running the instance
+
   instance_type = "t2.micro"
   ami           = data.aws_ami.ubuntu.id
 
@@ -151,6 +178,8 @@ resource "aws_instance" "public_instance" {
 }
 
 resource "aws_instance" "private_instance" {
+  # EC2 instance attached to the private subnet
+
   instance_type = "t2.micro"
   ami           = data.aws_ami.ubuntu.id
 
