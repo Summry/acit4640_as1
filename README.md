@@ -8,7 +8,7 @@ Provision aws infrastructure using terraform. Describe your active infrastructur
 
 ## Assignment Video
 
-- [Placeholder](https://www.youtube.com/watch?v=oh0RQ_TgDnQ)
+- [Placeholder](https://youtu.be/_y0zomMwxg8)
 
 ## AWS CLI Describe Commands
 
