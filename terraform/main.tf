@@ -50,17 +50,17 @@ resource "aws_subnet" "private_subnet" {
   availability_zone = "us-west-2a"
 }
 
-resource "aws_route_table" "main_route_table" {
+resource "aws_route_table" "public_route_table" {
   # Default route table attached to the virtual private cloud
 
   vpc_id = aws_vpc.main_vpc.id
 }
 
-resource "aws_route" "default_route" {
+resource "aws_route" "public_route" {
   # Default route attached to the route table and internet gateway
   # Route points towards the internet (0.0.0.0/0)
 
-  route_table_id         = aws_route_table.main_route_table.id
+  route_table_id         = aws_route_table.public_route_table.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.internet_gateway.id
 }
@@ -69,7 +69,7 @@ resource "aws_route_table_association" "rt_associator" {
   # Associates the identified route table to the public subnet
 
   subnet_id      = aws_subnet.public_subnet.id
-  route_table_id = aws_route_table.main_route_table.id
+  route_table_id = aws_route_table.public_route_table.id
 }
 
 resource "aws_security_group" "public_sg" {
@@ -116,7 +116,7 @@ resource "aws_security_group" "private_sg" {
 
 resource "aws_vpc_security_group_ingress_rule" "prv_in_ssh" {
   # Inbound rule for the private subnet security group - allows SSH traffic
-  
+
   security_group_id = aws_security_group.private_sg.id
 
   from_port   = 22
